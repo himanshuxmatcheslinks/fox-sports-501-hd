@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TG_@matcheslinks</title>
+    <style>
+        /* General Page Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #242424, #3b5998);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        /* Video Player Styling */
+        .player-container {
+            width: 100%;
+            max-width: 100%;
+            height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+
+        .player-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Verification System Styling */
+        #verifyPopup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .verify-content {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 2px solid #3b5998;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .verify-content h2 {
+            color: #3b5998;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .verify-content p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .verify-timer {
+            font-size: 18px;
+            color: #facc15;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .verify-btn {
+            background: linear-gradient(to right, #3b5998, #2d4373);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .verify-btn:hover {
+            background: linear-gradient(to right, #2d4373, #1e2e4f);
+            transform: translateY(-2px);
+        }
+
+        .blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(10px);
+            z-index: 1500;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Verification System Elements -->
+    <div class="blur-overlay" id="blurOverlay"></div>
+    <div id="verifyPopup">
+        <div class="verify-content">
+            <h2>🔒 VERIFICATION REQUIRED</h2>
+            <p>Please verify to continue watching the live stream</p>
+            <div class="verify-timer" id="verifyTimer">24:00:00</div>
+            <button class="verify-btn" id="verifyBtn">VERIFY NOW</button>
+        </div>
+    </div>
+
+    <!-- Video Player Section -->
+    <div class="player-container" id="playerContainer"></div>
+
+    <script>
+        // Verification System Functions
+        function checkVerification() {
+            const verifiedUntil = localStorage.getItem('verified_until');
+            const now = new Date();
+            
+            if (verifiedUntil && parseInt(verifiedUntil) > now.getTime()) {
+                // Verified - hide verification popup
+                document.getElementById('verifyPopup').style.display = 'none';
+                document.getElementById('blurOverlay').style.display = 'none';
+                
+                // Start countdown timer
+                startCountdown(parseInt(verifiedUntil));
+                
+                // Load the player
+                loadIframe();
+            } else {
+                // Not verified - show verification popup
+                document.getElementById('verifyPopup').style.display = 'flex';
+                document.getElementById('blurOverlay').style.display = 'block';
+            }
+        }
+
+        function startCountdown(expireTime) {
+            const timerElement = document.getElementById('verifyTimer');
+            
+            function updateTimer() {
+                const now = new Date();
+                const diff = expireTime - now.getTime();
+                
+                if (diff <= 0) {
+                    // Verification expired
+                    localStorage.removeItem('verified_until');
+                    checkVerification();
+                    return;
+                }
+                
+                // Calculate hours, minutes, seconds
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // Format as HH:MM:SS
+                timerElement.textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            // Update immediately and then every second
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+
+        document.getElementById('verifyBtn').addEventListener('click', function() {
+            // Set verification for 24 hours
+            const expire = Date.now() + (24 * 60 * 60 * 1000);
+            localStorage.setItem('verified_until', expire);
+            
+            // Redirect to verification link
+            window.location.href = 'https://vplink.in/FYhJJlM';
+        });
+
+        // Inject iframe dynamically with stricter sandbox to block popups
+        function loadIframe() {
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('gesture', 'media');
+            iframe.setAttribute('allow', 'encrypted-media; autoplay');
+            iframe.setAttribute('allowfullscreen', 'true');
+            iframe.setAttribute('scrolling', 'yes');
+            iframe.setAttribute('src', 'https://idx.gdplayertv.to/live-tv/fox-cricket/?embed=1');
+            document.getElementById('playerContainer').appendChild(iframe);
+        }
+
+        // Check verification when page loads
+        document.addEventListener('DOMContentLoaded', checkVerification);
+    </script>
+</body>
+</html>
